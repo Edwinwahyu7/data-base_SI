@@ -1,0 +1,54 @@
+-- Tabel Pengguna: Menyimpan informasi tentang pelanggan, kasir/admin, dan owner
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    role ENUM('pelanggan', 'kasir', 'owner') NOT NULL
+);
+
+-- Tabel Menu: Menyimpan item yang tersedia, kategori, harga, dan stok
+CREATE TABLE menu (
+    menu_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    category ENUM('Rakjat', 'Aristokrat', 'Kudapan') NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL
+);
+
+-- Tabel Pesanan: Menyimpan pemesanan oleh pelanggan
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2),
+    status ENUM('pending', 'completed', 'canceled') DEFAULT 'pending',
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- Tabel Detail Pesanan: Menyimpan item per pesanan yang dipilih pelanggan
+CREATE TABLE order_details (
+    order_detail_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT,
+    menu_id INT,
+    quantity INT NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (menu_id) REFERENCES menu(menu_id)
+);
+
+-- Tabel Rekomendasi Menu: Menyimpan data untuk rekomendasi menu ke pelanggan
+CREATE TABLE recommendations (
+    recommendation_id INT PRIMARY KEY AUTO_INCREMENT,
+    menu_id INT,
+    recommendation_score DECIMAL(5, 2) DEFAULT 0,
+    FOREIGN KEY (menu_id) REFERENCES menu(menu_id)
+);
+
+-- Tabel Penjualan: Menyimpan laporan penjualan yang dapat diakses oleh owner
+CREATE TABLE sales_report (
+    report_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT,
+    report_date DATE DEFAULT CURRENT_DATE,
+    revenue DECIMAL(10, 2),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
